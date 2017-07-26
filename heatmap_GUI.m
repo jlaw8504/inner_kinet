@@ -519,9 +519,10 @@ function open_image_Callback(hObject, eventdata, handles)
 wdir = pwd;
 
 %select the file
-[filename pathname] = uigetfile('*.tif', 'Choose the GFP image stack');
+[filename pathname] = uigetfile('*.*', 'Choose the GFP image stack');
 %read in the file using tif3Dread.m
-im_mat = tif3Dread(strcat(pathname,filename));
+im_cell = bfopen(strcat(pathname,filename));
+im_mat = bf2mat(im_cell);
 %change image to double
 im_mat = double(im_mat);
 %set up data to axes1 plot
@@ -547,8 +548,9 @@ set(handles.stack_text,'String',strcat(num2str(current_stack),...
     num2str('/'), num2str(stack_total)));
 
 %open the RFP stack in axes3
-[filename pathname] = uigetfile('*.tif', 'Choose the RFP image stack');
-im_mat_2 = tif3Dread(strcat(pathname,filename));
+[filename pathname] = uigetfile('*.*', 'Choose the RFP image stack');
+im_cell_2 = bfopen(strcat(pathname,filename));
+im_mat_2 = bf2mat(im_cell_2);
 im_mat_2 = double(im_mat_2);
 handles.im_mat_2 = im_mat_2;
 subplot(handles.axes3);
