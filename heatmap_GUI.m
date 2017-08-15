@@ -22,7 +22,7 @@ function varargout = heatmap_GUI(varargin)
 
 % Edit the above text to modify the response to help heatmap_GUI
 
-% Last Modified by GUIDE v2.5 06-Jan-2017 14:52:03
+% Last Modified by GUIDE v2.5 15-Aug-2017 09:57:43
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -93,13 +93,17 @@ slider_value = ceil(get(handles.plane_slider,'Value'));
 if isempty(gfp_points) == 0 && isempty(spb_points) == 0
     subplot(handles.axes3);
     hold on;
-    imshow(handles.im_mat_2(:,:,slider_value),[]);
+    imshow(handles.im_mat_2(:,:,slider_value),...
+        [get(handles.axes3_min_slider, 'Value'),...
+        get(handles.axes3_max_slider, 'Value')]);
     plot(gfp_points(:,1), gfp_points(:,2), 'go');
     plot(spb_points(:,1), spb_points(:,2), 'rx');
     hold off;
         subplot(handles.axes1);
     hold on;
-    imshow(handles.im_mat(:,:,slider_value),[]);
+    imshow(handles.im_mat(:,:,slider_value),...
+        [get(handles.axes1_min_slider, 'Value'),...
+        get(handles.axes1_max_slider, 'Value')]);
     plot(gfp_points(:,1), gfp_points(:,2), 'go');
     plot(spb_points(:,1), spb_points(:,2), 'rx');
     hold off;
@@ -107,32 +111,44 @@ if isempty(gfp_points) == 0 && isempty(spb_points) == 0
 elseif isempty(gfp_points) == 0 && isempty(spb_points) == 1
     subplot(handles.axes3);
     hold on;
-    imshow(handles.im_mat_2(:,:,slider_value),[]);
+    imshow(handles.im_mat_2(:,:,slider_value),...
+        [get(handles.axes3_min_slider, 'Value'),...
+        get(handles.axes3_max_slider, 'Value')]);
     plot(gfp_points(:,1), gfp_points(:,2), 'go');
     hold off;
         subplot(handles.axes1);
     hold on;
-    imshow(handles.im_mat(:,:,slider_value),[]);
+    imshow(handles.im_mat(:,:,slider_value),...
+        [get(handles.axes1_min_slider, 'Value'),...
+        get(handles.axes1_max_slider, 'Value')]);
     plot(gfp_points(:,1), gfp_points(:,2), 'go');
     hold off;
     %if you have SPB spots only, plot them when slider updates
 elseif isempty(gfp_points) == 1 && isempty(spb_points) == 0
     subplot(handles.axes3);
     hold on;
-    imshow(handles.im_mat_2(:,:,slider_value),[]);
+    imshow(handles.im_mat_2(:,:,slider_value),...
+        [get(handles.axes3_min_slider, 'Value'),...
+        get(handles.axes3_max_slider, 'Value')]);
     plot(spb_points(:,1), spb_points(:,2), 'rx');
     hold off;
         subplot(handles.axes1);
     hold on;
-    imshow(handles.im_mat(:,:,slider_value),[]);
+    imshow(handles.im_mat(:,:,slider_value),...
+        [get(handles.axes1_min_slider, 'Value'),...
+        get(handles.axes1_max_slider, 'Value')]);
     plot(spb_points(:,1), spb_points(:,2), 'rx');
     hold off;
 %if you have no spots yet,do not plot when slider updates
  else
     subplot(handles.axes3);
-    imshow(handles.im_mat_2(:,:,slider_value),[]);
+    imshow(handles.im_mat_2(:,:,slider_value),...
+        [get(handles.axes3_min_slider, 'Value'),...
+        get(handles.axes3_max_slider, 'Value')]);
     subplot(handles.axes1);
-    imshow(handles.im_mat(:,:,slider_value),[]);
+    imshow(handles.im_mat(:,:,slider_value),...
+        [get(handles.axes1_min_slider, 'Value'),...
+        get(handles.axes1_max_slider, 'Value')]);
 end
 
 
@@ -525,10 +541,17 @@ im_cell = bfopen(strcat(pathname,filename));
 im_mat = bf2mat(im_cell);
 %change image to double
 im_mat = double(im_mat);
+%set contrast sliders for Axes1
+set(handles.axes1_min_slider, 'SliderStep', [1/(max(im_mat(:))-min(im_mat(:))), 0.1],...
+    'Min', min(im_mat(:)), 'Max', max(im_mat(:)), 'Value', min(im_mat(:)));
+set(handles.axes1_max_slider, 'SliderStep', [1/(max(im_mat(:))-min(im_mat(:))), 0.1],...
+    'Min', min(im_mat(:)), 'Max', max(im_mat(:)), 'Value', max(im_mat(:)));
 %set up data to axes1 plot
 subplot(handles.axes1);
 %show first frame of image stack
-imshow(im_mat(:,:,1),[]);
+imshow(im_mat(:,:,1),...
+        [get(handles.axes1_min_slider, 'Value'),...
+        get(handles.axes1_max_slider, 'Value')]);
 %read in the number of frames
 [~,~,plane_num] = size(im_mat);
 handles.plane_num = plane_num;
@@ -552,9 +575,16 @@ set(handles.stack_text,'String',strcat(num2str(current_stack),...
 im_cell_2 = bfopen(strcat(pathname,filename));
 im_mat_2 = bf2mat(im_cell_2);
 im_mat_2 = double(im_mat_2);
+%set contrast sliders for Axes3
+set(handles.axes3_min_slider, 'SliderStep', [1/(max(im_mat_2(:))-min(im_mat_2(:))), 0.1],...
+    'Min', min(im_mat_2(:)), 'Max', max(im_mat_2(:)), 'Value', min(im_mat_2(:)));
+set(handles.axes3_max_slider, 'SliderStep', [1/(max(im_mat_2(:))-min(im_mat_2(:))), 0.1],...
+    'Min', min(im_mat_2(:)), 'Max', max(im_mat_2(:)), 'Value', max(im_mat_2(:)));
 handles.im_mat_2 = im_mat_2;
 subplot(handles.axes3);
-imshow(im_mat_2(:,:, ceil(get(handles.plane_slider,'Value'))),[]);
+imshow(im_mat_2(:,:, ceil(get(handles.plane_slider,'Value'))),...
+        [get(handles.axes3_min_slider, 'Value'),...
+        get(handles.axes3_max_slider, 'Value')]);
 %set up the cell array that will hold the image stack data
 data_cell = {'lacO 1','lacO 1 Stretch','lacO 2','lacO 2 Stretch',...
     'SPB 1', 'SPB 2','Step Size (nm)',...
@@ -679,3 +709,91 @@ function clear_spbs_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 handles.spb_points = [];
 guidata(hObject,handles);
+
+
+% --- Executes on slider movement.
+function axes1_max_slider_Callback(hObject, eventdata, handles)
+% hObject    handle to axes1_max_slider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function axes1_max_slider_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to axes1_max_slider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on slider movement.
+function axes3_max_slider_Callback(hObject, eventdata, handles)
+% hObject    handle to axes3_max_slider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function axes3_max_slider_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to axes3_max_slider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on slider movement.
+function axes1_min_slider_Callback(hObject, eventdata, handles)
+% hObject    handle to axes1_min_slider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function axes1_min_slider_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to axes1_min_slider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on slider movement.
+function axes3_min_slider_Callback(hObject, eventdata, handles)
+% hObject    handle to axes3_min_slider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function axes3_min_slider_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to axes3_min_slider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
