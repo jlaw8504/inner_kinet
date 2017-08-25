@@ -1,12 +1,11 @@
-function s = lac_summary(directory, slbounds)
+function s = lac_summary(directory)
 %LAC_SUMMARY Summary script for comparing WT and brn1-9 mutants containing
 %1p7 kb lacO/LacI-GFP array
 
-%Parse data
-[s.gfp1, s.gfp2, s.rfp1, s.rfp2, s.pixel_size, s.z_step] = parse_data(directory);
+%Parse data using spindle bounds in 2D
+[s.gfp1, s.gfp2, s.rfp1, s.rfp2, s.pixel_size, s.z_step, s.stretch_array] = spindle_bounds(directory, [0 2000], 2);
 %Spindle Length
 [s.sl_2d, s.sl_3d] = calc_sep(s.rfp1, s.rfp2, s.pixel_size, s.z_step);
-
 %Lac Separation
 [s.sep_2d, s.sep_3d] = calc_sep(s.gfp1, s.gfp2, s.pixel_size, s.z_step);
 s.mean_sep_2d = mean(s.sep_2d(:));
@@ -19,3 +18,5 @@ s.mean_rd2 = mean(s.rad_dist_2d(:));
 s.sem_rd2 = std(s.rad_dist_2d(:))/sqrt(numel(s.rad_dist_2d(:)));
 s.mean_rd3 = mean(s.rad_dist_3d(:));
 s.sem_rd3 = std(s.rad_dist_3d(:))/sqrt(numel(s.rad_dist_3d(:)));
+%Stretch frequency
+s.stretch_freq = sum(s.stretch_array(:))/numel(s.stretch_array);
